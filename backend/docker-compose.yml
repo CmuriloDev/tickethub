@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: tickethub-db
+    environment:
+      POSTGRES_DB: tickethub
+      POSTGRES_USER: tickethub
+      POSTGRES_PASSWORD: tickethub
+    ports:
+      - "5432:5432"
+    volumes:
+      - tickethub_pgdata:/var/lib/postgresql/data
+
+volumes:
+  tickethub_pgdata:
