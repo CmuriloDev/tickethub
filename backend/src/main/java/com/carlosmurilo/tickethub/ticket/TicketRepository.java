@@ -9,6 +9,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
+
     Page<Ticket> findAllByUser(User user, Pageable pageable);
+
     Optional<Ticket> findByIdAndUser(UUID id, User user);
+
+    Page<Ticket> findAllByUserAndStatus(User user, TicketStatus status, Pageable pageable);
+
+    Page<Ticket> findAllByUserAndPriority(User user, TicketPriority priority, Pageable pageable);
+
+    Page<Ticket> findAllByUserAndStatusAndPriority(User user, TicketStatus status, TicketPriority priority, Pageable pageable);
 }
