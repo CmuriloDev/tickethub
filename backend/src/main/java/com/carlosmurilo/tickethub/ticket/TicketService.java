@@ -1,5 +1,6 @@
 package com.carlosmurilo.tickethub.ticket;
 
+import com.carlosmurilo.tickethub.exception.ResourceNotFoundException;
 import com.carlosmurilo.tickethub.ticket.dto.CreateTicketRequest;
 import com.carlosmurilo.tickethub.ticket.dto.TicketResponse;
 import com.carlosmurilo.tickethub.ticket.dto.UpdateTicketRequest;
@@ -60,14 +61,14 @@ public class TicketService {
     public TicketResponse getById(UUID userId, UUID ticketId) {
         User user = getUserOrThrow(userId);
         Ticket ticket = ticketRepository.findByIdAndUser(ticketId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         return toResponse(ticket);
     }
 
     public TicketResponse update(UUID userId, UUID ticketId, UpdateTicketRequest req) {
         User user = getUserOrThrow(userId);
         Ticket ticket = ticketRepository.findByIdAndUser(ticketId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
         ticket.setTitle(req.getTitle().trim());
         ticket.setDescription(req.getDescription());
@@ -82,13 +83,13 @@ public class TicketService {
     public void delete(UUID userId, UUID ticketId) {
         User user = getUserOrThrow(userId);
         Ticket ticket = ticketRepository.findByIdAndUser(ticketId, user)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
         ticketRepository.delete(ticket);
     }
 
     private User getUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private TicketResponse toResponse(Ticket t) {
