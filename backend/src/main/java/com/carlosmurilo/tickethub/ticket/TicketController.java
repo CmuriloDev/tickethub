@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 import java.util.UUID;
 
@@ -64,5 +65,11 @@ public class TicketController {
             @PathVariable UUID id
     ) {
         ticketService.delete(userId, id);
+    }
+    @GetMapping("/stats")
+    public Map<TicketStatus, Long> stats(
+            @RequestHeader("X-User-Id") UUID userId
+    ) {
+        return ticketService.getStats(userId);
     }
 }

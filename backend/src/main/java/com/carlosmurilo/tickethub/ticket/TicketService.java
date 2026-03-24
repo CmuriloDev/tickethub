@@ -9,6 +9,9 @@ import com.carlosmurilo.tickethub.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.List;
+import java.util.EnumMap;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -102,5 +105,24 @@ public class TicketService {
                 t.getCreatedAt(),
                 t.getUpdatedAt()
         );
+    }
+    public Map<TicketStatus, Long> getStats(UUID userId) {
+        User user = getUserOrThrow(userId);
+
+        List<Object[]> results = ticketRepository.countTicketsByStatus(user);
+
+        Map<TicketStatus, Long> stats = new EnumMap<>(TicketStatus.class);
+
+        for (TicketStatus status : TicketStatus.values()) {
+            stats.put(status, 0L);
+        }
+
+        for (Object[] row : results) {
+            TicketStatus status = (TicketStatus) row[0];
+            Long count = (Long) row[1];
+            stats.put(status, count);
+        }
+
+        return stats;
     }
 }

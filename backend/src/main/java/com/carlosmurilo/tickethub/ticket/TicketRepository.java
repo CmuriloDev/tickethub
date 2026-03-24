@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.Query;
+import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
@@ -19,4 +21,12 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     Page<Ticket> findAllByUserAndPriority(User user, TicketPriority priority, Pageable pageable);
 
     Page<Ticket> findAllByUserAndStatusAndPriority(User user, TicketStatus status, TicketPriority priority, Pageable pageable);
+
+    @Query("""
+    SELECT t.status, COUNT(t)
+    FROM Ticket t
+    WHERE t.user = :user
+    GROUP BY t.status
+""")
+    List<Object[]> countTicketsByStatus(User user);
 }
