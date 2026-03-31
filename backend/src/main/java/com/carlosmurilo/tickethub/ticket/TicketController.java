@@ -3,13 +3,15 @@ package com.carlosmurilo.tickethub.ticket;
 import com.carlosmurilo.tickethub.ticket.dto.CreateTicketRequest;
 import com.carlosmurilo.tickethub.ticket.dto.TicketResponse;
 import com.carlosmurilo.tickethub.ticket.dto.UpdateTicketRequest;
+import com.carlosmurilo.tickethub.user.User;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -25,51 +27,52 @@ public class TicketController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TicketResponse create(
-            @RequestHeader("X-User-Id") UUID userId,
+            @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateTicketRequest request
     ) {
-        return ticketService.create(userId, request);
+        return ticketService.create(user, request);
     }
 
     @GetMapping
     public Page<TicketResponse> list(
-            @RequestHeader("X-User-Id") UUID userId,
+            @AuthenticationPrincipal User user,
             @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) TicketPriority priority,
             Pageable pageable
     ) {
-        return ticketService.list(userId, status, priority, pageable);
+        return ticketService.list(user, status, priority, pageable);
     }
 
     @GetMapping("/{id}")
     public TicketResponse getById(
-            @RequestHeader("X-User-Id") UUID userId,
+            @AuthenticationPrincipal User user,
             @PathVariable UUID id
     ) {
-        return ticketService.getById(userId, id);
+        return ticketService.getById(user, id);
     }
 
     @PutMapping("/{id}")
     public TicketResponse update(
-            @RequestHeader("X-User-Id") UUID userId,
+            @AuthenticationPrincipal User user,
             @PathVariable UUID id,
             @Valid @RequestBody UpdateTicketRequest request
     ) {
-        return ticketService.update(userId, id, request);
+        return ticketService.update(user, id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
-            @RequestHeader("X-User-Id") UUID userId,
+            @AuthenticationPrincipal User user,
             @PathVariable UUID id
     ) {
-        ticketService.delete(userId, id);
+        ticketService.delete(user, id);
     }
+
     @GetMapping("/stats")
     public Map<TicketStatus, Long> stats(
-            @RequestHeader("X-User-Id") UUID userId
+            @AuthenticationPrincipal User user
     ) {
-        return ticketService.getStats(userId);
+        return ticketService.getStats(user);
     }
 }

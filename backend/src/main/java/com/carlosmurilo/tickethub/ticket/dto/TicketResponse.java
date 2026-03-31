@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class TicketResponse {
     private UUID id;
+    private UUID createdById;
     private String title;
     private String description;
     private TicketStatus status;
@@ -15,10 +16,11 @@ public class TicketResponse {
     private Instant createdAt;
     private Instant updatedAt;
 
-    public TicketResponse(UUID id, String title, String description,
+    public TicketResponse(UUID id, UUID createdById, String title, String description,
                           TicketStatus status, TicketPriority priority,
                           Instant createdAt, Instant updatedAt) {
         this.id = id;
+        this.createdById = createdById;
         this.title = title;
         this.description = description;
         this.status = status;
@@ -28,6 +30,7 @@ public class TicketResponse {
     }
 
     public UUID getId() { return id; }
+    public UUID getCreatedById() { return createdById; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public TicketStatus getStatus() { return status; }

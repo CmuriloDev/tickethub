@@ -13,8 +13,12 @@ public class Ticket {
     private UUID id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "created_by_id", nullable = false)
+    private User createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_to_id")
+    private User assignedTo;
 
     @Column(nullable = false, length = 160)
     private String title;
@@ -30,7 +34,7 @@ public class Ticket {
     @Column(nullable = false, length = 30)
     private TicketPriority priority;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
@@ -42,7 +46,6 @@ public class Ticket {
         var now = Instant.now();
         createdAt = now;
         updatedAt = now;
-
         if (status == null) status = TicketStatus.OPEN;
         if (priority == null) priority = TicketPriority.MEDIUM;
     }
@@ -52,12 +55,14 @@ public class Ticket {
         updatedAt = Instant.now();
     }
 
-    // getters/setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public User getCreatedBy() { return createdBy; }
+    public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
+
+    public User getAssignedTo() { return assignedTo; }
+    public void setAssignedTo(User assignedTo) { this.assignedTo = assignedTo; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

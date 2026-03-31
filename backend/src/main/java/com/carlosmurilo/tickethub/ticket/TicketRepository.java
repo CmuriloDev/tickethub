@@ -4,29 +4,26 @@ import com.carlosmurilo.tickethub.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
+import java.util.UUID;
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
-    Page<Ticket> findAllByUser(User user, Pageable pageable);
+    Page<Ticket> findAllByCreatedBy(User user, Pageable pageable);
+    Page<Ticket> findAllByCreatedByAndStatus(User user, TicketStatus status, Pageable pageable);
+    Page<Ticket> findAllByCreatedByAndPriority(User user, TicketPriority priority, Pageable pageable);
+    Page<Ticket> findAllByCreatedByAndStatusAndPriority(User user, TicketStatus status, TicketPriority priority, Pageable pageable);
 
-    Optional<Ticket> findByIdAndUser(UUID id, User user);
+    Page<Ticket> findAllByStatus(TicketStatus status, Pageable pageable);
+    Page<Ticket> findAllByPriority(TicketPriority priority, Pageable pageable);
+    Page<Ticket> findAllByStatusAndPriority(TicketStatus status, TicketPriority priority, Pageable pageable);
 
-    Page<Ticket> findAllByUserAndStatus(User user, TicketStatus status, Pageable pageable);
+    // --- Stats ---
+    @Query("SELECT t.status, COUNT(t) FROM Ticket t WHERE t.createdBy = :user GROUP BY t.status")
+    List<Object[]> countTicketsByStatusAndUser(User user);
 
-    Page<Ticket> findAllByUserAndPriority(User user, TicketPriority priority, Pageable pageable);
-
-    Page<Ticket> findAllByUserAndStatusAndPriority(User user, TicketStatus status, TicketPriority priority, Pageable pageable);
-
-    @Query("""
-    SELECT t.status, COUNT(t)
-    FROM Ticket t
-    WHERE t.user = :user
-    GROUP BY t.status
-""")
-    List<Object[]> countTicketsByStatus(User user);
+    @Query("SELECT t.status, COUNT(t) FROM Ticket t GROUP BY t.status")
+    List<Object[]> countAllTicketsByStatus();
 }
