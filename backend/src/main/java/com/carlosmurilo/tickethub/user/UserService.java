@@ -2,6 +2,8 @@ package com.carlosmurilo.tickethub.user;
 
 import com.carlosmurilo.tickethub.user.dto.CreateUserRequest;
 import com.carlosmurilo.tickethub.user.dto.UserResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +29,23 @@ public class UserService {
         user.setName(req.getName().trim());
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
+        user.setRole(UserRole.USER);
 
         User saved = userRepository.save(user);
+        return toResponse(saved);
+    }
 
+    public Page<UserResponse> listAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(this::toResponse);
+    }
+
+    private UserResponse toResponse(User user) {
         return new UserResponse(
-                saved.getId(),
-                saved.getName(),
-                saved.getEmail(),
-                saved.getCreatedAt()
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getCreatedAt()
         );
     }
 }

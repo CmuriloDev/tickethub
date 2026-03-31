@@ -5,6 +5,7 @@ import com.carlosmurilo.tickethub.ticket.dto.CreateTicketRequest;
 import com.carlosmurilo.tickethub.ticket.dto.TicketResponse;
 import com.carlosmurilo.tickethub.ticket.dto.UpdateTicketRequest;
 import com.carlosmurilo.tickethub.user.User;
+import com.carlosmurilo.tickethub.user.UserRepository;
 import com.carlosmurilo.tickethub.user.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,11 @@ import java.util.UUID;
 public class TicketService {
 
     private final TicketRepository ticketRepository;
+    private final UserRepository userRepository;
 
-    public TicketService(TicketRepository ticketRepository) {
+    public TicketService(TicketRepository ticketRepository,  UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
+        this.userRepository = userRepository;
     }
 
     public TicketResponse create(User user, CreateTicketRequest req) {
@@ -96,6 +99,31 @@ public class TicketService {
         for (Object[] row : results) stats.put((TicketStatus) row[0], (Long) row[1]);
 
         return stats;
+    }
+
+    public Page<TicketResponse> listAll(TicketStatus status, TicketPriority priority, Pageable pageable) {
+        Page<Ticket> page;
+        if (status != null && priority != null)
+            page = ticketRepository.findAllByStatusAndPriority(status, priority, pageable);
+        else if (status != null)
+            page = ticketRepository.findAllByStatus(status, pageable);
+        else if (priority != null)
+            page = ticketRepository.findAllByPriority(priority, pageable);
+        else
+            page = ticketRepository.findAll(pageable);
+
+        return page.map(this::toResponse);
+    }
+
+    public TicketResponse assignTicket(UUID ticketId, UUID adminId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        ticket.setAssignedTo(admin);
+        return toResponse(ticketRepository.save(ticket));
     }
 
     // --- helpers ---
