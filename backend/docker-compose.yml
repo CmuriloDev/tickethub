@@ -4,12 +4,30 @@ services:
     container_name: tickethub-db
     environment:
       POSTGRES_DB: tickethub
-      POSTGRES_USER: tickethub
-      POSTGRES_PASSWORD: tickethub
+      POSTGRES_USER: tickethubdb
+      POSTGRES_PASSWORD: tickethub18
     ports:
       - "5432:5432"
     volumes:
       - tickethub_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tickethubdb -d tickethub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: tickethub-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/tickethub
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   tickethub_pgdata:
