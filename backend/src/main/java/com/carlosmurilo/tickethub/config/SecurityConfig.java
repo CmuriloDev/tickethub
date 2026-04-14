@@ -48,9 +48,10 @@ public class SecurityConfig {
                         // --- Health check ---
                         .requestMatchers("/actuator/health", "/health").permitAll()
 
-                        // --- Admin Routes: just ADMIN ---
+                        // --- Rotas admin: apenas ADMIN ---
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
+                        // --- Todo o resto exige autenticação ---
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
