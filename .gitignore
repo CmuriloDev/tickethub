@@ -9,5 +9,6 @@
 .DS_Store
 Thumbs.db
 
-# Env
+# Env - use .env.example for shared config
 .env
+.env.local
